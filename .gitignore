@@ -10,10 +10,6 @@
 *.test
 *.out
 
-# Go modules cache
-vendor/
-*.sum
-
 # Logs
 *.log
 
