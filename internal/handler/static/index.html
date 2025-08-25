@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Поиск заказа</title>
+        <link rel="icon" href="./static/favicon.ico" type="image/x-icon" />
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 40px;
+            }
+            .input-group {
+                display: flex;
+                gap: 10px;
+                width: 100%;
+            }
+
+            input {
+                flex: 1;
+                padding: 12px;
+                font-size: 16px;
+                box-sizing: border-box;
+                margin-bottom: 0;
+            }
+
+            button {
+                padding: 12px 24px;
+                font-size: 16px;
+                white-space: nowrap; 
+            }
+            #result {
+                margin-top: 20px;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+            }
+            pre {
+                background: #f8f8f8;
+                padding: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <h2>Поиск заказа</h2>
+        <div class="input-group">
+            <input
+                type="text"
+                id="orderId"
+                autocomplete="on"
+                placeholder="Введите UID заказа"
+            />
+            <button onclick="fetchOrder()">Найти</button>
+        </div>
+
+        <div id="result"></div>
+
+        <script>
+            async function fetchOrder() {
+                const id = document.getElementById("orderId").value.trim();
+                if (!id) {
+                    alert("Введите ID заказа!");
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`http://localhost/api/order/${id}`);
+                    if (!res.ok) {
+                        document.getElementById("result").innerHTML =
+                            "<b>Ошибка:</b> заказ не найден";
+                        return;
+                    }
+                    const data = await res.json();
+                    document.getElementById("result").innerHTML = `
+          <h3>Заказ найден в ${data.source} за ${data.duration}</h3>
+          <pre>${JSON.stringify(data.order, null, 2)}</pre>
+        `;
+                } catch (err) {
+                    console.error(err);
+                    document.getElementById("result").innerHTML =
+                        "Ошибка подключения к серверу";
+                }
+            }
+
+            document
+                .getElementById("orderId")
+                .addEventListener("keypress", function (event) {
+                    if (event.key === "Enter") {
+                        fetchOrder();
+                    }
+                });
+        </script>
+    </body>
+</html>
